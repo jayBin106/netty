@@ -48,7 +48,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
             file = new RandomAccessFile(fileFromRooe, "r");
         } catch (Exception ex) {
             //重点。。。。。。。。。。。。。，巨坑。。。。。。。。。。。。。。。
-            ctx.fireChannelRead(request.retain());
+            ctx.fireChannelRead(request.retain()); //有异常关掉，返回 后缀为im的websocket就会到这边
             return;
         }
 
