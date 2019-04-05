@@ -53,6 +53,7 @@ public class ChatServer {
                         }
                     });
             ChannelFuture f = b.bind(this.port).sync();
+
             LOG.info("服务已启动,监听端口" + this.port);
             f.channel().closeFuture().sync();
         } catch (InterruptedException e) {
