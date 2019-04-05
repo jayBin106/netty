@@ -2,13 +2,12 @@ package com.demo.netty.im_chat.server.handler;
 
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.net.URL;
-
-import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
 /**
  * HttpHandler
@@ -17,8 +16,23 @@ import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
  * 2019/4/5 11:01
  */
 public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+    private static Logger LOG = Logger.getLogger(HttpHandler.class);
+
     //获取类路径
     private URL baseURL = HttpHandler.class.getProtectionDomain().getCodeSource().getLocation();
+
+    //获取请求的文件
+    private File getFileFromRooe(String fileNamme) {
+        try {
+            String path = baseURL.toURI() + "static/" + fileNamme;
+            path = !path.contains("file:") ? path : path.substring(5);
+            path = path.replaceAll("//", "/");
+            return new File(path);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     //用来来接http请求  netty只要是方法后加0的，都是实现类的方法，不是接口
     //可以拿到处理后的结果
@@ -28,23 +42,30 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
         //获得客户端请求的url，获取的是localhost：8080端口后面的数据
         String uri = request.getUri();
         String page = uri.equals("/") ? "chat.html" : uri;
-        File fileFromRooe = getFileFromRooe(page);
-        RandomAccessFile file = new RandomAccessFile(fileFromRooe, "r");//读的方式
-        System.out.println(file);
+        RandomAccessFile file = null;//读的方式
+        try {
+            File fileFromRooe = getFileFromRooe(page);
+            file = new RandomAccessFile(fileFromRooe, "r");
+        } catch (Exception ex) {
+            //重点。。。。。。。。。。。。。，巨坑。。。。。。。。。。。。。。。
+            ctx.fireChannelRead(request.retain());
+            return;
+        }
+
+//        System.out.println(file);
         //写出文件 ！！！！！！
 
         HttpResponse response = new DefaultHttpResponse(request.getProtocolVersion(), HttpResponseStatus.OK);
-        String contextType;
-        contextType = "text/html;";
+        String contextType = "text/html;";
         if (uri.endsWith(".css")) {
             contextType = "text/css;";
-        } else if (uri.endsWith(".css")) {
+        } else if (uri.endsWith(".js")) {
             contextType = "text/javascript;";
-        } else if (uri.toLowerCase().matches("(jpg|png|gif)")) {
-            String substring = uri.substring(uri.lastIndexOf("."));
-            contextType = "image/" + substring;
+        } else if (uri.toLowerCase().matches("(jpg|png|gif)$")) {
+            String ext = uri.substring(uri.lastIndexOf("."));
+            contextType = "image/" + ext;
         }
-        response.headers().set(CONTENT_TYPE, contextType + "charset=utf-8;");
+        response.headers().set(HttpHeaders.Names.CONTENT_TYPE, contextType + "charset=utf-8;");
         //判断是否是长链接
         boolean keepAlive = HttpHeaders.isKeepAlive(request);
         if (keepAlive) {
@@ -63,22 +84,13 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
         file.close();
     }
 
-    //获取请求的文件
-    private File getFileFromRooe(String fileNamme) {
-        try {
-            String path = baseURL.toURI() + "static/" + fileNamme;
-            path = !path.startsWith("file:") ? path : path.substring(6);
-            path = path.replace("//", "/");
-            return new File(path);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     //异常处理
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+        Channel client = ctx.channel();
+        LOG.info("Client:" + client.remoteAddress() + "异常");
+        // 当出现异常就关闭连接
+        cause.printStackTrace();
+        ctx.close();
     }
 }
