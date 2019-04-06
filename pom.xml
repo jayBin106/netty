@@ -34,6 +34,7 @@
             <artifactId>netty-all</artifactId>
             <version>4.1.6.Final</version>
         </dependency>
+        <!--序列化包-->
         <dependency>
             <groupId>org.msgpack</groupId>
             <artifactId>msgpack</artifactId>

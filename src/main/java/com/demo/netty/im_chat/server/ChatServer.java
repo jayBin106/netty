@@ -1,6 +1,9 @@
 package com.demo.netty.im_chat.server;
 
+import com.demo.netty.im_chat.protocol.IMDecoder;
+import com.demo.netty.im_chat.protocol.IMEncoder;
 import com.demo.netty.im_chat.server.handler.HttpHandler;
+import com.demo.netty.im_chat.server.handler.SocketHandler;
 import com.demo.netty.im_chat.server.handler.WebSocketHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -23,7 +26,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
  * netty实现tomcat的原理，数据请求到tomcat都是字符串，有servlet只是一个方法和抽象类，
  * 真正调用方法的是自己写的那个类，request和response都是通过服务器返回的，
  */
-public class ChatServer2 {
+public class ChatServer {
     public void start(int port) throws Exception {
         //传统nio
 //        ServerSocketChannel open = ServerSocketChannel.open();
@@ -49,7 +52,10 @@ public class ChatServer2 {
                         @Override
                         protected void initChannel(SocketChannel client) throws Exception {
                             //无锁化 串行编程
-                            //自定义业务
+                            //添加自定义socker协议
+                            client.pipeline().addLast(new IMDecoder());
+                            client.pipeline().addLast(new IMEncoder());
+                            client.pipeline().addLast(new SocketHandler());
                             //用来解码和编码http请求
                             client.pipeline().addLast(new HttpServerCodec());
                             //为了实现继承SimpleChannelInboundHandler而加的，参数是能够接收到最大的 请求头大小
@@ -63,6 +69,8 @@ public class ChatServer2 {
                             //开启websocker  im前以ws开头，包含im的认为是走websocket协议
                             client.pipeline().addLast(new WebSocketServerProtocolHandler("/im"));
                             client.pipeline().addLast(new WebSocketHandler());
+
+
                         }
                     })
                     //配置信息
@@ -84,7 +92,7 @@ public class ChatServer2 {
 
     public static void main(String[] args) {
         try {
-            new ChatServer2().start(81);
+            new ChatServer().start(81);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {

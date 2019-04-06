@@ -84,6 +84,11 @@ public class IMProcessor {
         }
     }
 
+    public void process(Channel channel, IMMessage msg) {
+        process(channel, encoder.encode(msg));
+    }
+
+
     public void process(Channel client, String msg) {
         //将消息编码后才能对象
         IMMessage message = decoder.decode(msg);
@@ -160,4 +165,5 @@ public class IMProcessor {
     public void logout(Channel client) {
         onlineUser.remove(client);
     }
+
 }
