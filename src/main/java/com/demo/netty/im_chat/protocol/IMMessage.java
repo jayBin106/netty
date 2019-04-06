@@ -20,8 +20,18 @@ public class IMMessage{
 	private String content;	//消息内容
 	
 	public IMMessage(){}
-	
-	public IMMessage(String cmd,long time,int online,String content){
+
+	public IMMessage(String addr, String cmd, long time, int online, String sender, String receiver, String content) {
+		this.addr = addr;
+		this.cmd = cmd;
+		this.time = time;
+		this.online = online;
+		this.sender = sender;
+		this.receiver = receiver;
+		this.content = content;
+	}
+
+	public IMMessage(String cmd, long time, int online, String content){
 		this.cmd = cmd;
 		this.time = time;
 		this.online = online;

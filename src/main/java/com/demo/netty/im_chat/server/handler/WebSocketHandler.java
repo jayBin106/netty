@@ -23,6 +23,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
     //监听浏览器退出，关闭窗口
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("有人退出了。。");
         imProcessor.logout(ctx.channel());
     }
 }

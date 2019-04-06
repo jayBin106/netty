@@ -84,7 +84,7 @@ public class ChatServer2 {
 
     public static void main(String[] args) {
         try {
-            new ChatServer2().start(8081);
+            new ChatServer2().start(81);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {

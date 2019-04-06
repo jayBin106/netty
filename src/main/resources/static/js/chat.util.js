@@ -56,6 +56,7 @@ $(document).ready(function () {
         },
         //退出登录
         logout: function () {
+            CHAT.socket.send("[LOGOUT][" + new Date().getTime() + "][" + nickname + "]");
             location.reload();
         },
         //清空聊天记录
