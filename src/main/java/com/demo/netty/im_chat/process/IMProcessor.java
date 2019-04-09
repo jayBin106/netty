@@ -12,6 +12,11 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * IMProcessor
  * <p>
@@ -40,6 +45,16 @@ public class IMProcessor {
      */
     public String getNickName(Channel client) {
         return client.attr(NICK_NAME).get();
+    }
+
+    /**
+     * 获取IP
+     *
+     * @param client
+     * @return
+     */
+    public String getIpAddress(Channel client) {
+        return client.attr(IP_ADDR).get();
     }
 
     /**
@@ -102,14 +117,25 @@ public class IMProcessor {
         if (message.getCmd().equals(IMP.LOGIN.getName())) {
             //把登录人名称放入变量中
             client.attr(NICK_NAME).getAndSet(message.getSender());
+            //放入ip
+            client.attr(IP_ADDR).getAndSet(getAddress(client));
             onlineUser.add(client);
             //系统通知,循环所有用户如果不是当前用户就提醒
+            List<Map<String, String>> maps = new ArrayList<>();
+            for (Channel c : onlineUser) {
+                Map<String, String> map = new HashMap<>();
+                map.put("name", getNickName(c));
+                map.put("ip", getAddress(c));
+                maps.add(map);
+            }
             for (Channel channel : onlineUser) {
                 if (client != channel) {
                     message = new IMMessage(IMP.SYSTEM.getName(), System.currentTimeMillis(), onlineUser.size(), senderName + "进入聊天室");
                 } else {
                     message = new IMMessage(IMP.SYSTEM.getName(), System.currentTimeMillis(), onlineUser.size(), "已和服务器建立连接。。");
                 }
+                //将人员信息给message
+                message.setMapList(maps);
                 //将消息对象发给客户端
                 send(channel, message);
             }

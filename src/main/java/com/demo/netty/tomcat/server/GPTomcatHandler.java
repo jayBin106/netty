@@ -30,7 +30,6 @@ public class GPTomcatHandler extends ChannelInboundHandlerAdapter {
             HttpRequest request = (HttpRequest) msg;
             GPRequest gpRequest = new GPRequest(ctx, request);
             GPResponse gpResponse = new GPResponse(ctx, request);
-
             new MyServlet().doGet(gpRequest, gpResponse);
         }
     }

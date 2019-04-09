@@ -139,7 +139,7 @@ $(document).ready(function () {
             $("#shownikcname").html(nickname);
 
             //添加系统提示
-            var addSystemTip = function (c) {
+            var addSystemTip = function (c, s) {
                 var html = "";
                 html += '<div class="msg-system">';
                 html += c;
@@ -149,11 +149,26 @@ $(document).ready(function () {
                 section.innerHTML = html;
 
                 $("#onlinemsg").append(section);
+
+
+                var html2 = "";
+                var jsonlist = "[" + s + "]";
+                var xqo = eval('(' + jsonlist + ')');
+                for (var i in xqo) {
+                    var n = xqo[i].name;
+                    var p = xqo[i].ip;
+                    html2 += '<li><button value=' + p + '>' + n + '<li/>';
+                }
+                var html3 = '<ul>' + html2 + '</ul>';
+
+                //清空节点下面的html
+                $("#peoplelist").html("");
+                $("#peoplelist").append(html3);
             };
             //将消息添加到聊天面板
             var appendToPanel = function (message) {
                 var regx = /^\[(.*)\](\s\-\s(.*))?/g;
-                var group = '', label = "", content = "", cmd = "", time = 0, name = "";
+                var group = '', label = "", content = "", cmd = "", time = 0, name = "", peopleList = "";
                 while (group = regx.exec(message)) {
                     label = group[1];
                     content = group[3];
@@ -162,11 +177,12 @@ $(document).ready(function () {
                 cmd = labelArr[0];
                 time = labelArr[1];
                 name = labelArr[2];
+                peopleList = labelArr[3];
 
                 if (cmd == "SYSTEM") {
                     var total = labelArr[2];
                     $("#onlinecount").html("" + total);
-                    addSystemTip(content);
+                    addSystemTip(content, peopleList);
                 } else if (cmd == "CHAT") {
                     var date = new Date(parseInt(time));
                     addSystemTip('<span class="time-label">' + date.format("hh:mm:ss") + '</span>');
