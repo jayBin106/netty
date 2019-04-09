@@ -1,10 +1,7 @@
 package com.demo.netty.rpc.registry;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -13,6 +10,8 @@ import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+
+import java.rmi.registry.RegistryHandler;
 
 /**
  * ·RpcRegistry
@@ -37,20 +36,21 @@ public class RpcRegistry {
             b.channel(NioServerSocketChannel.class);
             b.childHandler(new ChannelInitializer<SocketChannel>() {
                 @Override
-                protected void initChannel(SocketChannel sh) throws Exception {
-//                    开启串行任务链
-//                   处理的 拆包，黏包，的解码编码器
-                    sh.pipeline().addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
-                    sh.pipeline().addLast(new LengthFieldPrepender(4));
+                protected void initChannel(SocketChannel ch) throws Exception {
+                    ChannelPipeline pipeline = ch.pipeline();
 
-                    //协议用Java，jdk默认的序列化
-                    sh.pipeline().addLast("encoder", new ObjectEncoder());
-//                   解码 不让做缓存
-                    sh.pipeline().addLast("decoder", new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
+                    //处理的拆包、粘包的解、编码器
+                    pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
+                    pipeline.addLast(new LengthFieldPrepender(4));
 
-                    //自定义业务
-                    sh.pipeline().addLast(new RegistryHander());
 
+                    //处理序列化的解、编码器（JDK默认的序列化）
+                    pipeline.addLast("encoder", new ObjectEncoder());
+                    pipeline.addLast("decoder", new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
+
+
+                    //自己的业务逻辑
+                    pipeline.addLast(new RegistryHander());
                 }
             })
                     .option(ChannelOption.SO_BACKLOG, 128)

@@ -38,6 +38,8 @@ public class RegistryHander extends ChannelInboundHandlerAdapter {
         doRegister();
     }
 
+
+
     /**
      * 来接受客户端传过来的值
      *
@@ -60,39 +62,25 @@ public class RegistryHander extends ChannelInboundHandlerAdapter {
         ctx.close();
     }
 
-    /**
-     * 异常捕获
-     *
-     * @param ctx
-     * @param cause
-     * @throws Exception
-     */
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
-        ctx.close();
-    }
-
     //扫描所有的class
     private void scanClass(String packageName) {
         URL url = this.getClass().getClassLoader().getResource(packageName.replaceAll("\\.", "/"));
         File file = new File(url.getFile());
         for (File f : file.listFiles()) {
-//            判断是否是个文件夹
+            //判断是否是个文件夹
             if (f.isDirectory()) {
                 scanClass(packageName + "." + f.getName());
             } else {
-//                获取类路径
+                //获取类路径
                 String calssName = packageName + "." + f.getName().replace(".class", "").trim();
                 classCache.add(calssName);
             }
         }
-
     }
 
     //把扫描的所有class实例化，放入到map中
     //注册的服务名字就是接口的名字
-//    约定优于配置
+    //约定优于配置
     private void doRegister() {
         if (classCache != null && classCache.size() > 0) {
             for (String className : classCache) {
@@ -106,5 +94,18 @@ public class RegistryHander extends ChannelInboundHandlerAdapter {
                 }
             }
         }
+    }
+
+    /**
+     * 异常捕获
+     *
+     * @param ctx
+     * @param cause
+     * @throws Exception
+     */
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+        ctx.close();
     }
 }
