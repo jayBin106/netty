@@ -30,6 +30,12 @@ $(document).ready(function () {
         nickname: null,
         //保存浏览器socket对象
         socket: null,
+        //接收用户的ip地址
+        ipAddr: null,
+        //当前用户的ip地址
+        myipAddr: null,
+        //接收用户的名字
+        receivename: null,
         //将滚动条设置到最顶部，以便能看到最新的消息
         scrollToBottom: function () {
             window.scrollTo(0, $("#onlinemsg")[0].scrollHeight);
@@ -74,7 +80,7 @@ $(document).ready(function () {
                 return;
             }
             if (CHAT.socket.readyState == WebSocket.OPEN) {
-                var msg = ("[CHAT][" + new Date().getTime() + "]" + "[" + CHAT.nickname + "] - " + message.html().replace(/\n/ig, "<br/>"));
+                var msg = ("[CHAT][" + new Date().getTime() + "]" + "[" + CHAT.nickname + "][" + CHAT.ipAddr + "][" + CHAT.receivename + "] - " + message.html().replace(/\n/ig, "<br/>"));
                 CHAT.socket.send(msg);
                 message.empty();
                 message.focus();
@@ -123,6 +129,11 @@ $(document).ready(function () {
             }
             faceBox.html(box);
         },
+        //获取选择用户的ip地址
+        openWork: function (o) {
+            CHAT.ipAddr = o.value;
+            CHAT.receivename = o.name;
+        },
         //初始化聊天组件
         init: function (nickname) {
             var message = $("#send-message");
@@ -150,25 +161,28 @@ $(document).ready(function () {
 
                 $("#onlinemsg").append(section);
 
+                if (s != null) {
+                    var html2 = "";
+                    var jsonlist = "[" + s + "]";
+                    var xqo = eval('(' + jsonlist + ')');
+                    for (var i in xqo) {
+                        var x = xqo[i];
+                        var n = x.name;
+                        var ip = x.ip;
+                        html2 += '<li><button name="' + n + '" value="' + ip + '" onclick="CHAT.openWork(this)" >' + n + '<li/>';
+                    }
+                    var html3 = '<ul>' + html2 + '</ul>';
 
-                var html2 = "";
-                var jsonlist = "[" + s + "]";
-                var xqo = eval('(' + jsonlist + ')');
-                for (var i in xqo) {
-                    var n = xqo[i].name;
-                    var p = xqo[i].ip;
-                    html2 += '<li><button value=' + p + '>' + n + '<li/>';
+                    //清空节点下面的html
+                    $("#peoplelist").html("");
+                    $("#peoplelist").append(html3);
                 }
-                var html3 = '<ul>' + html2 + '</ul>';
-
-                //清空节点下面的html
-                $("#peoplelist").html("");
-                $("#peoplelist").append(html3);
             };
             //将消息添加到聊天面板
             var appendToPanel = function (message) {
                 var regx = /^\[(.*)\](\s\-\s(.*))?/g;
-                var group = '', label = "", content = "", cmd = "", time = 0, name = "", peopleList = "";
+                var group = '', label = "", content = "", cmd = "", time = 0, name = "", peopleList = "",
+                    receiveIp = "";
                 while (group = regx.exec(message)) {
                     label = group[1];
                     content = group[3];
@@ -177,16 +191,20 @@ $(document).ready(function () {
                 cmd = labelArr[0];
                 time = labelArr[1];
                 name = labelArr[2];
-                peopleList = labelArr[3];
-
                 if (cmd == "SYSTEM") {
+                    if (labelArr.length > 3) {
+                        peopleList = labelArr[3];
+                    }
                     var total = labelArr[2];
                     $("#onlinecount").html("" + total);
                     addSystemTip(content, peopleList);
                 } else if (cmd == "CHAT") {
+                    if (labelArr.length > 3) {
+                        receiveIp = labelArr[3];
+                    }
                     var date = new Date(parseInt(time));
-                    addSystemTip('<span class="time-label">' + date.format("hh:mm:ss") + '</span>');
-                    var isme = (name == "you") ? true : false;
+                    addSystemTip('<span class="time-label">' + date.format("hh:mm:ss") + '</span>', null);
+                    var isme = (name == "我") ? true : false;
                     var contentDiv = '<div>' + content + '</div>';
                     var usernameDiv = '<span>' + name + '</span>';
 
@@ -195,12 +213,15 @@ $(document).ready(function () {
                         section.className = 'user';
                         section.innerHTML = contentDiv + usernameDiv;
                     } else {
-                        section.className = 'service';
-                        section.innerHTML = usernameDiv + contentDiv;
+                        if (receiveIp != "" && receiveIp != CHAT.myipAddr) {
+                        } else {
+                            section.className = 'service';
+                            section.innerHTML = usernameDiv + contentDiv;
+                        }
                     }
                     $("#onlinemsg").append(section);
                 } else if (cmd == "FLOWER") {
-                    addSystemTip(content);
+                    addSystemTip(content, null);
                     //鲜花特效
                     $(document).snowfall('clear');
                     $(document).snowfall({
@@ -237,6 +258,47 @@ $(document).ready(function () {
             } else {
                 alert("你的浏览器不支持 WebSocket！");
             }
+
+            //获取ip
+            function getUserIP(onNewIP) {
+                //  onNewIp - your listener function for new IPs
+                //compatibility for firefox and chrome
+                var myPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+                var pc = new myPeerConnection({
+                        iceServers: []
+                    }),
+                    noop = function () {
+                    },
+                    localIPs = {},
+                    ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g,
+                    key;
+
+                function iterateIP(ip) {
+                    if (!localIPs[ip]) onNewIP(ip);
+                    localIPs[ip] = true;
+                }
+
+                pc.createDataChannel("");
+                pc.createOffer().then(function (sdp) {
+                    sdp.sdp.split('\n').forEach(function (line) {
+                        if (line.indexOf('candidate') < 0) return;
+                        line.match(ipRegex).forEach(iterateIP);
+                    });
+
+                    pc.setLocalDescription(sdp, noop, noop);
+                }).catch(function (reason) {
+                    // An error occurred, so handle the failure to connect
+                });
+                pc.onicecandidate = function (ice) {
+                    if (!ice || !ice.candidate || !ice.candidate.candidate || !ice.candidate.candidate.match(ipRegex)) return;
+                    ice.candidate.candidate.match(ipRegex).forEach(iterateIP);
+                };
+            }
+
+            getUserIP(function (ip) {
+                alert("Got IP! :" + ip);
+                CHAT.myipAddr = ip;
+            });
         }
     };
 });

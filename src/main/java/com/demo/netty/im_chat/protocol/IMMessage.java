@@ -25,11 +25,10 @@ public class IMMessage {
     public IMMessage() {
     }
 
-    public IMMessage(String addr, String cmd, long time, int online, String sender, String receiver, String content) {
+    public IMMessage(String addr, String cmd, long time, String sender, String receiver, String content) {
         this.addr = addr;
         this.cmd = cmd;
         this.time = time;
-        this.online = online;
         this.sender = sender;
         this.receiver = receiver;
         this.content = content;

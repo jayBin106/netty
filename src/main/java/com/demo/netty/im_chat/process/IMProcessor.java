@@ -12,6 +12,8 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +66,9 @@ public class IMProcessor {
      * @return
      */
     public String getAddress(Channel client) {
-        return client.remoteAddress().toString().replaceFirst("/", "");
+        String first = client.remoteAddress().toString().replaceFirst("/", "");
+        String substring = first.substring(0, first.indexOf(":"));
+        return substring;
     }
 
     /**
@@ -117,8 +121,14 @@ public class IMProcessor {
         if (message.getCmd().equals(IMP.LOGIN.getName())) {
             //把登录人名称放入变量中
             client.attr(NICK_NAME).getAndSet(message.getSender());
-            //放入ip
-            client.attr(IP_ADDR).getAndSet(getAddress(client));
+            //服务端ip地址
+            try {
+                InetAddress localHost = InetAddress.getLocalHost();
+                String hostAddress = localHost.getHostAddress();
+                client.attr(IP_ADDR).getAndSet(hostAddress);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
             onlineUser.add(client);
             //系统通知,循环所有用户如果不是当前用户就提醒
             List<Map<String, String>> maps = new ArrayList<>();

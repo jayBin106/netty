@@ -28,6 +28,8 @@ public class IMEncoder extends MessageToByteEncoder<IMMessage> {
                 IMP.CHAT.getName().equals(msg.getCmd()) ||
                 IMP.FLOWER.getName().equals(msg.getCmd())) {
             prex += ("[" + msg.getSender() + "]");
+            prex += ("[" + msg.getAddr() + "]");
+            prex += ("[" + msg.getReceiver() + "]");
         } else if (IMP.SYSTEM.getName().equals(msg.getCmd())) {
             prex += ("[" + msg.getOnline() + "]");
         }

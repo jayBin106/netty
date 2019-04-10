@@ -75,11 +75,18 @@ public class IMDecoder extends ByteToMessageDecoder {
             String nickName = heards[2];
             //昵称最多十个字
             nickName = nickName.length() < 10 ? nickName : nickName.substring(0, 9);
+            //接收人ip
+            String ip = "";
+            String receiverName = "";
+            if (heards.length > 3) {
+                ip = heards[3];
+                receiverName = heards[4];
+            }
 
             if (msg.startsWith("[" + IMP.LOGIN.getName() + "]")) {
                 return new IMMessage(heards[0], time, nickName);
             } else if (msg.startsWith("[" + IMP.CHAT.getName() + "]")) {
-                return new IMMessage(heards[0], time, nickName, content);
+                return new IMMessage(ip, heards[0], time, nickName, receiverName, content);
             } else if (msg.startsWith("[" + IMP.FLOWER.getName() + "]")) {
                 return new IMMessage(heards[0], time, nickName);
             } else {
