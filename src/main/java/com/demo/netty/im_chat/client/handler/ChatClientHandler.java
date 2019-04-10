@@ -56,10 +56,11 @@ public class ChatClientHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         this.ctx = ctx;
         IMMessage message = new IMMessage(IMP.LOGIN.getName(), System.currentTimeMillis(), this.nickName);
-        sendMsg(message);
-        LOG.info("成功连接服务器,已执行登录动作");
+        if (sendMsg(message)) {
+            LOG.info("成功连接服务器,已执行登录动作");
 //        启动控制台
-        session();
+            session();
+        }
     }
 
     /**

@@ -33,9 +33,11 @@ public class IMProcessor {
     //解码器
     private IMEncoder encoder = new IMEncoder();
 
-    //属性参数
+    //登录昵称名
     private final AttributeKey<String> NICK_NAME = AttributeKey.valueOf("nickName");
+    //第三方客户端的ip地址
     private final AttributeKey<String> IP_ADDR = AttributeKey.valueOf("ipAddr");
+    //扩展属性
     private final AttributeKey<JSONObject> ATTRS = AttributeKey.valueOf("attrs");
 
 
