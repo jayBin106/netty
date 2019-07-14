@@ -1,5 +1,6 @@
 package com.demo.netty.im_chat.protocol;
 
+import com.alibaba.fastjson.JSONObject;
 import org.msgpack.MessagePack;
 
 import io.netty.buffer.ByteBuf;
@@ -28,8 +29,13 @@ public class IMEncoder extends MessageToByteEncoder<IMMessage> {
                 IMP.FLOWER.getName().equals(msg.getCmd())||
                 IMP.FILE.getName().equals(msg.getCmd())) {
             prex += ("[" + msg.getSender() + "]");
+            prex += ("[" + msg.getAddr() + "]");
+            prex += ("[" + msg.getReceiver() + "]");
         } else if (IMP.SYSTEM.getName().equals(msg.getCmd())) {
             prex += ("[" + msg.getOnline() + "]");
+        }
+        if (msg.getMapList() != null && msg.getMapList().size() > 0) {
+            prex += JSONObject.toJSONString(msg.getMapList());
         }
         if (!(null == msg.getContent() || "".equals(msg.getContent()))) {
             prex += (" - " + msg.getContent());

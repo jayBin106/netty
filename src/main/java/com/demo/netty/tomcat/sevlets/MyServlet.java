@@ -11,6 +11,7 @@ import java.io.UnsupportedEncodingException;
  * <p>
  * liwenbin
  * 2019/4/5 9:56
+ * 实现抽象方法
  */
 public class MyServlet extends GPservlet {
     @Override

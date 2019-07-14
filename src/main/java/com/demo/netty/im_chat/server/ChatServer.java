@@ -82,7 +82,7 @@ public class ChatServer {
 
             //启动服务  。sync是同步操作会有一个阻塞的过程，线程会处理等待中
             ChannelFuture future = serverBootstrap.bind(port).sync();
-            System.out.println("GPTomcat已经启动8081");
+            System.out.println("ChatServer已经启动81");
             future.channel().closeFuture().sync();
         } catch (Exception ex) {
             ex.printStackTrace();

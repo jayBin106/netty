@@ -7,6 +7,8 @@ import java.io.UnsupportedEncodingException;
  * <p>
  * liwenbin
  * 2019/4/5 9:53
+ *
+ * 抽象方法
  */
 public abstract class GPservlet {
     public abstract void doGet(GPRequest request, GPResponse response) throws UnsupportedEncodingException;

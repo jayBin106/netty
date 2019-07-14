@@ -31,10 +31,7 @@ public class RpcProxy {
         T t = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, methProxy);
         return t;
     }
-
-
 }
-
 
 //伪代理
 class MethProxy implements InvocationHandler {
@@ -66,8 +63,6 @@ class MethProxy implements InvocationHandler {
         msg.setValues(args);
 
         final RpcProxyHander hander = new RpcProxyHander();
-
-
         EventLoopGroup group = new NioEventLoopGroup();
         Bootstrap b = new Bootstrap();
         try {
@@ -101,7 +96,6 @@ class MethProxy implements InvocationHandler {
         } finally {
             group.shutdownGracefully();
         }
-
         return hander.getResult();
     }
 }

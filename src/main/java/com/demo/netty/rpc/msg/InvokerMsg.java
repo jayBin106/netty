@@ -1,11 +1,13 @@
 package com.demo.netty.rpc.msg;
 
+import java.io.Serializable;
+
 /**
  * ·InvokerMsg
  * ·李文彬
  * 2019/4/7 ·10:36
  */
-public class InvokerMsg {
+public class InvokerMsg implements Serializable {
     private String className;  //服务名称
     private String methodName;  //方法名称
     private Class<?>[] parames;  //参数列表
