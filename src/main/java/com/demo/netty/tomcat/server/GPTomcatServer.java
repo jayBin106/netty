@@ -10,11 +10,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 
-import java.net.ServerSocket;
-import java.nio.channels.ServerSocketChannel;
-
 /**
- * GPTomcat
+ * GPTomcatServer
  * <p>
  * liwenbin
  * 2019/4/5 9:23
@@ -22,7 +19,7 @@ import java.nio.channels.ServerSocketChannel;
  * netty实现tomcat的原理，数据请求到tomcat都是字符串，有servlet只是一个方法和抽象类，
  * 真正调用方法的是自己写的那个类，request和response都是通过服务器返回的，
  */
-public class GPTomcat {
+public class GPTomcatServer {
     public void start(int port) throws Exception {
         //传统nio
 //        ServerSocketChannel open = ServerSocketChannel.open();
@@ -63,8 +60,9 @@ public class GPTomcat {
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
             //启动服务  。sync是同步操作会有一个阻塞的过程，线程会处理等待中
+            //在创建一个新连接接入器的时候，会把我们用户在上面自定义的属性，传递进入，通过新连接创建的时候，会把新连接绑定到线程上面去；
             ChannelFuture future = serverBootstrap.bind(port).sync();
-            System.out.println("GPTomcat已经启动");
+            System.out.println("GPTomcatServer已经启动");
             future.channel().closeFuture().sync();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -77,7 +75,7 @@ public class GPTomcat {
 
     public static void main(String[] args) {
         try {
-            new GPTomcat().start(8080);
+            new GPTomcatServer().start(8080);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {

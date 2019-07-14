@@ -18,7 +18,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
 /**
- * GPTomcat
+ * GPTomcatServer
  * <p>
  * liwenbin
  * 2019/4/5 9:23
@@ -58,7 +58,8 @@ public class ChatServer {
                             client.pipeline().addLast(new SocketHandler());
                             //用来解码和编码http请求
                             client.pipeline().addLast(new HttpServerCodec());
-                            //为了实现继承SimpleChannelInboundHandler而加的，参数是能够接收到最大的 请求头大小
+                            //为了实现继承SimpleChannelInboundHandler而加的，
+                            // 参数是能够接收到最大的 , 请求头大小
                             client.pipeline().addLast(new HttpObjectAggregator(64 * 1024));
                             //用于处理文件流的hander
                             //自定义的拦截器
@@ -66,6 +67,8 @@ public class ChatServer {
                             client.pipeline().addLast(new ChunkedWriteHandler());
                             client.pipeline().addLast(new HttpHandler());
 
+
+                            //=========================接受webSocker请求====================================
                             //开启websocker  im前以ws开头，包含im的认为是走websocket协议
                             client.pipeline().addLast(new WebSocketServerProtocolHandler("/im"));
                             client.pipeline().addLast(new WebSocketHandler());

@@ -44,9 +44,15 @@
                 <div class="tool-box">
                     <div class="face-box" id="face-box"></div>
                     <span class="face" onclick="CHAT.openFace()" title="选择表情"></span>
-                    <span class="img" id="tool-img-btn" title="发送图片"></span>
-                    <span class="file" id="tool-file-btn" title="上传文件"></span>
                     <span class="flower" onclick="CHAT.sendFlower()" title="送鲜花"></span>
+                    <!--<span class="img" id="tool-img-btn" title="发送图片"></span>-->
+                    <!--<span class="file" id="tool-file-btn" title="上传文件"></span>-->
+                    <!--<input type="file" id="blogrollimage" onchange="CHAT.uploadPic(this)"  txlFillIn="isNotNull" title="链接图片">-->
+                    <!--<form id="upload" enctype="multipart/form-data" method="post">-->
+                    <!--<input type="file" name="file" id="pic"/>-->
+                    <!--<input type="button" value="提交" onclick="CHAT.uploadPic()"/>-->
+                    <!--</form>-->
+                    <input type="file" class="img" onchange="CHAT.uploadPic(this)"/><br>
                 </div>
                 <div class="input-box">
                     <div class="input" contenteditable="true" id="send-message"></div>

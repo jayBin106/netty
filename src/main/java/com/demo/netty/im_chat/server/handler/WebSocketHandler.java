@@ -10,6 +10,9 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
  * <p>
  * liwenbin
  * 2019/4/5 15:23
+ *
+ *
+ * 实现SimpleChannelInboundHandler接口，泛型是TextWebSocketFrame
  */
 public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
     private IMProcessor imProcessor = new IMProcessor();

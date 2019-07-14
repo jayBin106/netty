@@ -12,6 +12,11 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
 /**
  * IMProcessor
  * <p>
@@ -145,8 +150,29 @@ public class IMProcessor {
                 message.setTime(System.currentTimeMillis());
                 send(channel, message);
             }
-
-
+        } else if (IMP.FILE.getName().equals(message.getCmd())) {
+            try {
+                FileChannel read = FileChannel.open(Paths.get("g:/timg.jpg"), StandardOpenOption.READ);
+                String timeMillis = "images/" + System.currentTimeMillis() + ".jpg";
+                String newFile = "G:/workspace/springBoot/netty/target/classes/static/" + timeMillis;
+                FileChannel write = FileChannel.open(Paths.get(newFile), StandardOpenOption.WRITE, StandardOpenOption.READ, StandardOpenOption.CREATE);
+                // 这两个相等
+                write.transferFrom(read, 0, read.size());
+                read.close();
+                write.close();
+                for (Channel channel : onlineUser) {
+                    if (channel != client) {
+                        message.setSender(getNickName(client));
+                    } else {
+                        message.setSender("我");
+                    }
+                    String path = "<img src=" + timeMillis + ">";
+                    message.setContent(path);
+                    send(channel, message);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -159,6 +185,7 @@ public class IMProcessor {
      */
     private void send(Channel channel, IMMessage message) {
         String encodeText = encoder.encode(message);
+        System.out.println("发送消息 = " + encodeText);
         channel.writeAndFlush(new TextWebSocketFrame(encodeText));
     }
 

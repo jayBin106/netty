@@ -14,6 +14,9 @@ import java.net.URL;
  * <p>
  * liwenbin
  * 2019/4/5 11:01
+ * <p>
+ * http请求跳转类
+ * 页面的请求方法通过这个类跳转到首页
  */
 public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static Logger LOG = Logger.getLogger(HttpHandler.class);

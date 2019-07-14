@@ -30,18 +30,20 @@ public class GPTomcatHandler extends ChannelInboundHandlerAdapter {
             HttpRequest request = (HttpRequest) msg;
             GPRequest gpRequest = new GPRequest(ctx, request);
             GPResponse gpResponse = new GPResponse(ctx, request);
-
             new MyServlet().doGet(gpRequest, gpResponse);
+            System.out.println("channelRead====================== ");
         }
     }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         super.channelReadComplete(ctx);
+        System.out.println("channelReadComplete===================");
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
+        System.out.println("exceptionCaught=======================");
     }
 }

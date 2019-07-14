@@ -15,8 +15,10 @@ public enum IMP {
 	/** 聊天消息 */
 	CHAT("CHAT"),
 	/** 送鲜花 */
-	FLOWER("FLOWER");
-	
+	FLOWER("FLOWER"),
+	/*文件上传*/
+	FILE("FILE");
+
 	private String name;
 	
 	public static boolean isIMP(String content){

@@ -122,6 +122,33 @@ $(document).ready(function () {
                 box += '</span>';
             }
             faceBox.html(box);
+        },//文件上传
+        uploadPic: function (b) {
+            // alert(b.value)
+
+            // var file =b.files[0];
+            // var url=null
+            // if(window.createObjectURL!=undefined){ // basic
+            //     url=window.createObjectURL(file)
+            // }else if(window.URL!=undefined){ // mozilla(firefox)
+            //     url=window.URL.createObjectURL(file)
+            // } else if(window.webkitURL!=undefined){ // webkit or chrome
+            //     url=window.webkitURL.createObjectURL(file)
+            // }
+
+            url = "‪g:/timg.jpg";
+
+            if (!window.WebSocket) {
+                return;
+            }
+            if (CHAT.socket.readyState == WebSocket.OPEN) {
+                var msg = ("[FILE][" + new Date().getTime() + "]" + "[" + CHAT.nickname + "] - " + url.replace(/\n/ig, "<br/>"));
+                CHAT.socket.send(msg);
+                message.empty();
+                message.focus();
+            } else {
+                alert("与服务器连接失败.");
+            }
         },
         //初始化聊天组件
         init: function (nickname) {
@@ -167,10 +194,10 @@ $(document).ready(function () {
                     var total = labelArr[2];
                     $("#onlinecount").html("" + total);
                     addSystemTip(content);
-                } else if (cmd == "CHAT") {
+                } else if (cmd == "CHAT" || cmd=="FILE") {
                     var date = new Date(parseInt(time));
                     addSystemTip('<span class="time-label">' + date.format("hh:mm:ss") + '</span>');
-                    var isme = (name == "you") ? true : false;
+                    var isme = (name == "我") ? true : false;
                     var contentDiv = '<div>' + content + '</div>';
                     var usernameDiv = '<span>' + name + '</span>';
 
