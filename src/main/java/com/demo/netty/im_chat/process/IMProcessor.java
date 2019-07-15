@@ -156,7 +156,7 @@ public class IMProcessor {
                 message.setTime(System.currentTimeMillis());
                 send(channel, message);
             }
-        } else if (IMP.FILE.getName().equals(message.getCmd())) {
+        } else if (IMP.IMAGE.getName().equals(message.getCmd())) {
 //                String timeMillis = "images/" + System.currentTimeMillis() + ".png";
 //                String newFile = updataAdress + timeMillis;
 //                FileChannel read = FileChannel.open(Paths.get("d:/book.png"), StandardOpenOption.READ);

@@ -78,7 +78,7 @@ public class IMDecoder extends ByteToMessageDecoder {
 
             if (msg.startsWith("[" + IMP.LOGIN.getName() + "]")) {
                 return new IMMessage(heards[0], time, nickName);
-            } else if (msg.startsWith("[" + IMP.CHAT.getName() + "]") || msg.startsWith("[" + IMP.FILE.getName() + "]")) {
+            } else if (msg.startsWith("[" + IMP.CHAT.getName() + "]") || msg.startsWith("[" + IMP.IMAGE.getName() + "]")) {
                 return new IMMessage(heards[0], time, nickName, content);
             } else if (msg.startsWith("[" + IMP.FLOWER.getName() + "]")) {
                 return new IMMessage(heards[0], time, nickName);

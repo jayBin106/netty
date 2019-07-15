@@ -12,10 +12,14 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * GPTomcatServer
@@ -26,8 +30,13 @@ import io.netty.handler.stream.ChunkedWriteHandler;
  * netty实现tomcat的原理，数据请求到tomcat都是字符串，有servlet只是一个方法和抽象类，
  * 真正调用方法的是自己写的那个类，request和response都是通过服务器返回的，
  */
+@Component
 public class ChatServer {
-    public void start(int port) throws Exception {
+
+    @Value("${netty.max_frame_length}")
+    private int max_frame_length;
+
+    public void start(String address, int port) throws Exception {
         //传统nio
 //        ServerSocketChannel open = ServerSocketChannel.open();
 //        open.bind(local);
@@ -47,6 +56,7 @@ public class ChatServer {
             serverBootstrap
                     .group(bossGroup, workerGroup)  //收主线程和子线程
                     .channel(NioServerSocketChannel.class) //主线程处理类
+                    .localAddress(address, port)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         //客户端处理
                         @Override
@@ -74,6 +84,11 @@ public class ChatServer {
                             //开启websocker  im前以ws开头，包含im的认为是走websocket协议
                             client.pipeline().addLast(new WebSocketServerProtocolHandler("/im"));
                             client.pipeline().addLast(new WebSocketHandler());
+
+                            // 基于定长的方式解决粘包/拆包问题
+                            client.pipeline().addLast(new LengthFieldBasedFrameDecoder(max_frame_length
+                                    , 0, 2, 0, 2));
+                            client.pipeline().addLast(new LengthFieldPrepender(2));
                         }
                     })
                     //配置信息
@@ -81,8 +96,8 @@ public class ChatServer {
                     .option(ChannelOption.SO_BACKLOG, 1024);
 
             //启动服务  。sync是同步操作会有一个阻塞的过程，线程会处理等待中
-            ChannelFuture future = serverBootstrap.bind(port).sync();
-            System.out.println("ChatServer已经启动81");
+            ChannelFuture future = serverBootstrap.bind(address, port).sync();
+            System.out.println("ChatServer已经启动" + port);
             future.channel().closeFuture().sync();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -91,16 +106,5 @@ public class ChatServer {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
-    }
-
-    public static void main(String[] args) {
-        try {
-            new ChatServer().start(81);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-
-        }
-
     }
 }

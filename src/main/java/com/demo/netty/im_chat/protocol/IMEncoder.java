@@ -27,7 +27,7 @@ public class IMEncoder extends MessageToByteEncoder<IMMessage> {
         if (IMP.LOGIN.getName().equals(msg.getCmd()) ||
                 IMP.CHAT.getName().equals(msg.getCmd()) ||
                 IMP.FLOWER.getName().equals(msg.getCmd())||
-                IMP.FILE.getName().equals(msg.getCmd())) {
+                IMP.IMAGE.getName().equals(msg.getCmd())) {
             prex += ("[" + msg.getSender() + "]");
             prex += ("[" + msg.getAddr() + "]");
             prex += ("[" + msg.getReceiver() + "]");

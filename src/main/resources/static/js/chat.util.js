@@ -143,7 +143,7 @@ $(document).ready(function () {
                         return;
                     }
                     if (CHAT.socket.readyState == WebSocket.OPEN) {
-                        var msg = ("[FILE][" + new Date().getTime() + "]" + "[" + CHAT.nickname + "] - " + imgUrlPath);
+                        var msg = ("[IMAGE][" + new Date().getTime() + "]" + "[" + CHAT.nickname + "] - " + imgUrlPath);
                         CHAT.socket.send(msg);
                         message.empty();
                         message.focus();
@@ -199,7 +199,7 @@ $(document).ready(function () {
                     var total = labelArr[2];
                     $("#onlinecount").html("" + total);
                     addSystemTip(content);
-                } else if (cmd == "CHAT" || cmd == "FILE") {
+                } else if (cmd == "CHAT" || cmd == "IMAGE") {
                     var date = new Date(parseInt(time));
                     addSystemTip('<span class="time-label">' + date.format("hh:mm:ss") + '</span>');
                     var isme = (name == "我") ? true : false;
@@ -229,12 +229,10 @@ $(document).ready(function () {
                         $(document).snowfall('clear');
                         window.clearTimeout(flowerTimer);
                     }, 5000);
-
                 }
                 //有新的消息过来以后，自动切到最底部
                 CHAT.scrollToBottom();
             };
-
 
             if (!window.WebSocket) {
                 window.WebSocket = window.MozWebSocket;
