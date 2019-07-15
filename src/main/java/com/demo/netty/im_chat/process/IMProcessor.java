@@ -1,6 +1,7 @@
 package com.demo.netty.im_chat.process;
 
 import com.alibaba.fastjson.JSONObject;
+import com.demo.netty.im_chat.fastDFS.FileUpload;
 import com.demo.netty.im_chat.protocol.IMDecoder;
 import com.demo.netty.im_chat.protocol.IMEncoder;
 import com.demo.netty.im_chat.protocol.IMMessage;
@@ -13,6 +14,8 @@ import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -24,6 +27,9 @@ import java.nio.file.StandardOpenOption;
  * 2019/4/5 16:02
  */
 public class IMProcessor {
+    //文件上传服务器地址：
+    String updataAdress = "http://111.230.110.6:10080/";
+    //初始化当前登录用户个数
     private final static ChannelGroup onlineUser = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
     //编码器 字符串转对象
@@ -151,27 +157,25 @@ public class IMProcessor {
                 send(channel, message);
             }
         } else if (IMP.FILE.getName().equals(message.getCmd())) {
-            try {
-                FileChannel read = FileChannel.open(Paths.get("g:/timg.jpg"), StandardOpenOption.READ);
-                String timeMillis = "images/" + System.currentTimeMillis() + ".jpg";
-                String newFile = "G:/workspace/springBoot/netty/target/classes/static/" + timeMillis;
-                FileChannel write = FileChannel.open(Paths.get(newFile), StandardOpenOption.WRITE, StandardOpenOption.READ, StandardOpenOption.CREATE);
-                // 这两个相等
-                write.transferFrom(read, 0, read.size());
-                read.close();
-                write.close();
-                for (Channel channel : onlineUser) {
-                    if (channel != client) {
-                        message.setSender(getNickName(client));
-                    } else {
-                        message.setSender("我");
-                    }
-                    String path = "<img src=" + timeMillis + ">";
-                    message.setContent(path);
-                    send(channel, message);
+//                String timeMillis = "images/" + System.currentTimeMillis() + ".png";
+//                String newFile = updataAdress + timeMillis;
+//                FileChannel read = FileChannel.open(Paths.get("d:/book.png"), StandardOpenOption.READ);
+//                URI uri = new URI(newFile);
+//                FileChannel write = FileChannel.open(Paths.get(uri), StandardOpenOption.WRITE, StandardOpenOption.READ, StandardOpenOption.CREATE);
+//                // 这两个相等
+//                write.transferFrom(read, 0, read.size());
+//                read.close();
+//                write.close();
+            //设置图片src
+            String path = "<img src='data:image/png;base64," + message.getContent() + "'>";
+            message.setContent(path);
+            for (Channel channel : onlineUser) {
+                if (channel != client) {
+                    message.setSender(getNickName(client));
+                } else {
+                    message.setSender("我");
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+                send(channel, message);
             }
         }
     }

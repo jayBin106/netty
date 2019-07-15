@@ -52,10 +52,13 @@ public class ChatServer {
                         @Override
                         protected void initChannel(SocketChannel client) throws Exception {
                             //无锁化 串行编程
+                            //=========================处理socker请求====================================
                             //添加自定义socker协议
                             client.pipeline().addLast(new IMDecoder());
                             client.pipeline().addLast(new IMEncoder());
                             client.pipeline().addLast(new SocketHandler());
+
+                            //=========================处理Http请求====================================
                             //用来解码和编码http请求
                             client.pipeline().addLast(new HttpServerCodec());
                             //为了实现继承SimpleChannelInboundHandler而加的，
@@ -67,13 +70,10 @@ public class ChatServer {
                             client.pipeline().addLast(new ChunkedWriteHandler());
                             client.pipeline().addLast(new HttpHandler());
 
-
-                            //=========================接受webSocker请求====================================
+                            //=========================处理webSocker请求====================================
                             //开启websocker  im前以ws开头，包含im的认为是走websocket协议
                             client.pipeline().addLast(new WebSocketServerProtocolHandler("/im"));
                             client.pipeline().addLast(new WebSocketHandler());
-
-
                         }
                     })
                     //配置信息

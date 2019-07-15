@@ -10,7 +10,7 @@ public class NettyApplication {
     public static void main(String[] args) {
         SpringApplication.run(NettyApplication.class, args);
         try {
-            new ChatServer().start(8879);
+            new ChatServer().start(8869);
         } catch (Exception e) {
             e.printStackTrace();
         }
