@@ -17,7 +17,9 @@ public enum IMP {
 	/** 送鲜花 */
 	FLOWER("FLOWER"),
 	/*图片上传*/
-	IMAGE("IMAGE");
+	IMAGE("IMAGE"),
+	/*视频上传*/
+	VIDEO("VIDEO");
 
 	private String name;
 	

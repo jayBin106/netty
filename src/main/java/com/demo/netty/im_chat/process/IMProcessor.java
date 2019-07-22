@@ -27,8 +27,6 @@ import java.nio.file.StandardOpenOption;
  * 2019/4/5 16:02
  */
 public class IMProcessor {
-    //文件上传服务器地址：
-    String updataAdress = "http://111.230.110.6:10080/";
     //初始化当前登录用户个数
     private final static ChannelGroup onlineUser = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
@@ -157,17 +155,20 @@ public class IMProcessor {
                 send(channel, message);
             }
         } else if (IMP.IMAGE.getName().equals(message.getCmd())) {
-//                String timeMillis = "images/" + System.currentTimeMillis() + ".png";
-//                String newFile = updataAdress + timeMillis;
-//                FileChannel read = FileChannel.open(Paths.get("d:/book.png"), StandardOpenOption.READ);
-//                URI uri = new URI(newFile);
-//                FileChannel write = FileChannel.open(Paths.get(uri), StandardOpenOption.WRITE, StandardOpenOption.READ, StandardOpenOption.CREATE);
-//                // 这两个相等
-//                write.transferFrom(read, 0, read.size());
-//                read.close();
-//                write.close();
-            //设置图片src
-            String path = "<img src='data:image/png;base64," + message.getContent() + "'>";
+            //base64的方式设置：设置图片src
+//            String path = "<img src='data:image/png;base64," + message.getContent() + "'>";
+            String path = "<img src='" + message.getContent() + "'>";
+            message.setContent(path);
+            for (Channel channel : onlineUser) {
+                if (channel != client) {
+                    message.setSender(getNickName(client));
+                } else {
+                    message.setSender("我");
+                }
+                send(channel, message);
+            }
+        } else if (IMP.VIDEO.getName().equals(message.getCmd())) {
+            String path = "<video width='320' height='240' controls='controls' autoplay='autoplay'><source src='" + message.getContent() + "'type='video/mp4'/> </video>";
             message.setContent(path);
             for (Channel channel : onlineUser) {
                 if (channel != client) {

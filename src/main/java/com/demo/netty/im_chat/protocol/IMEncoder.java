@@ -26,6 +26,7 @@ public class IMEncoder extends MessageToByteEncoder<IMMessage> {
         String prex = "[" + msg.getCmd() + "]" + "[" + msg.getTime() + "]";
         if (IMP.LOGIN.getName().equals(msg.getCmd()) ||
                 IMP.CHAT.getName().equals(msg.getCmd()) ||
+                IMP.VIDEO.getName().equals(msg.getCmd()) ||
                 IMP.FLOWER.getName().equals(msg.getCmd())||
                 IMP.IMAGE.getName().equals(msg.getCmd())) {
             prex += ("[" + msg.getSender() + "]");

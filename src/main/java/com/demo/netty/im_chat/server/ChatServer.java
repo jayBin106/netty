@@ -56,7 +56,7 @@ public class ChatServer {
             serverBootstrap
                     .group(bossGroup, workerGroup)  //收主线程和子线程
                     .channel(NioServerSocketChannel.class) //主线程处理类
-                    .localAddress(address, port)
+                    .localAddress(port)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         //客户端处理
                         @Override
@@ -78,7 +78,7 @@ public class ChatServer {
                             //自定义的拦截器
                             //用来处理文件流的一个hander,主要用来处理大文件
                             client.pipeline().addLast(new ChunkedWriteHandler());
-                            client.pipeline().addLast(new HttpHandler());
+//                            client.pipeline().addLast(new HttpHandler());
 
                             //=========================处理webSocker请求====================================
                             //开启websocker  im前以ws开头，包含im的认为是走websocket协议
@@ -96,7 +96,7 @@ public class ChatServer {
                     .option(ChannelOption.SO_BACKLOG, 1024);
 
             //启动服务  。sync是同步操作会有一个阻塞的过程，线程会处理等待中
-            ChannelFuture future = serverBootstrap.bind(address, port).sync();
+            ChannelFuture future = serverBootstrap.bind(port).sync();
             System.out.println("ChatServer已经启动" + port);
             future.channel().closeFuture().sync();
         } catch (Exception ex) {
